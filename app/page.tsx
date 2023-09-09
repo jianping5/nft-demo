@@ -8,7 +8,7 @@ import nextConfig from '../next.config';
 export default function NFTCardFrame() {
   const { Meta } = Card;
   const {Search} = Input;
-  const reservoirApiKey = nextConfig.env.RESERVOIR_API_KEY;
+  const reservoirApiKey = nextConfig?.env?.RESERVOIR_API_KEY;
   const [nfts, setNFTs] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [web3, setWeb3] = useState(null);
