@@ -43,7 +43,13 @@ export default function NFTCardFrame() {
     // Fetch NFT data from Reservoir API
     const fetchNFTs = async () => {
       try {
-        const options = {method: 'GET', headers: {'accept': '*/*', 'x-api-key': reservoirApiKey}};
+        const options: RequestInit = {
+          method: 'GET',
+          headers: {
+            accept: '*/*',
+            'x-api-key': reservoirApiKey || '', // 确保 'apiKey' 的值不为 undefined
+          },
+        };
 
         fetch('https://api.reservoir.tools/tokens/v6?collection=0x5Af0D9827E0c53E4799BB226655A1de152A425a5', options)
           .then(response => response.json())
