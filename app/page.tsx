@@ -86,7 +86,7 @@ export default function NFTCardFrame() {
   // 悬浮显示卡片内容
   const CardContent = ({nft}) => {
 
-    const [metadata, setMetadata] = useState(null);
+    const [metadata, setMetadata] = useState<null | { attributes: { trait_type: string; value: string; }[] }>(null);
 
     useEffect(() => {
       // 异步加载 metadata
