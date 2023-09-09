@@ -89,13 +89,15 @@ export default function NFTCardFrame() {
     const [metadata, setMetadata] = useState<null | { attributes: { trait_type: string; value: string; }[] }>(null);
 
     useEffect(() => {
+
       // 异步加载 metadata
       const fetchMetadata = async () => {
         const response = await getMetaData(nft.token.tokenId) as { attributes: [{
           trait_type: string, value: string,
         }] };
-        console.log(response)
-        setMetadata(response); // 使用 setMetadata 更新 metadata 的值
+        // console.log(response)
+        // 使用 setMetadata 更新 metadata 的值
+        setMetadata(response); 
       };
   
       fetchMetadata();
@@ -151,9 +153,10 @@ export default function NFTCardFrame() {
             >
               <Card
                 hoverable
-                cover={<img alt={nft.name} src={nft.token.imageSmall} />}
+                cover={<img alt={nft.token.name} src={nft.token.imageSmall} />}
               >
                 <Meta title={nft.token.tokenId} />
+                <Meta title={nft.token.name} />
               </Card>
             </Popover>
           </Col>
