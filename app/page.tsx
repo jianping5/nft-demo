@@ -68,7 +68,7 @@ export default function NFTCardFrame() {
 
   // 根据 tokenId 进行过滤，如果搜索框为空则不进行过滤
   const filteredNFTs = searchTokenId
-    ? nfts.filter((nft) => nft.token.tokenId.toString() === searchTokenId)
+    ? nfts.filter((nft: { token: {tokenId: string }}) => nft.token.tokenId.toString() === searchTokenId)
     : nfts;
 
   // 搜索处理函数
