@@ -7,6 +7,8 @@ import nextConfig from '../../next.config';
 
 export default async function handler(req, res) {
 
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
   // 获取 web3 对象
   // todo：这里连接的 infura 提供的以太坊节点
   const web3 = new Web3(new Web3.providers.HttpProvider(nextConfig.env.PROVIDER_URL));
