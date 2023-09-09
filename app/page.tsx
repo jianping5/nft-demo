@@ -3,27 +3,23 @@ import React, { useState, useEffect } from "react";
 import { Card, Row, Col, Input, Popover } from "antd";
 import Web3 from "web3";
 import axios from 'axios'
-import contractABI from '../utils/contractABI.json';
+import nextConfig from '../next.config';
 
 export default function NFTCardFrame() {
   const { Meta } = Card;
   const {Search} = Input;
-  const reservoirApiKey = 'f61ab833-9b87-5fb9-96fa-e6f3323bb0e4';
+  const reservoirApiKey = nextConfig.env.RESERVOIR_API_KEY;
   const [nfts, setNFTs] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [web3, setWeb3] = useState(null);
   const [searchTokenId, setSearchTokenId] = useState(''); // 搜索框的值
 
   useEffect(() => {
+    console.log(reservoirApiKey)
     // 检查是否存在以太坊钱包提供程序
     if (window.ethereum) {
       const web3Instance = new Web3(window.ethereum);
 
-      // const getNFT = async () => {
-      //   const contract = new web3Instance.eth.Contract(contractABI, '0x5Af0D9827E0c53E4799BB226655A1de152A425a5');
-      //   const uri = await contract.methods.tokenURI(6503).call();
-      //   console.log(uri)
-      // }
 
       // 请求用户授权连接钱包
       window.ethereum.request({ method: 'eth_requestAccounts' })
@@ -33,10 +29,7 @@ export default function NFTCardFrame() {
           console.log(accounts)
           console.log("已连接钱包");
           setWeb3(web3Instance)
-          // setWeb3(web3Instance)
-          // demo:
-          // getMetaData(6503)
-
+          setAccounts(accounts)
         })
         .catch((error) => {
           // 处理错误
@@ -59,8 +52,6 @@ export default function NFTCardFrame() {
             setNFTs(response.tokens);
           })
           .catch(err => console.error(err));
-        // const response = await axios.get("https://api.reservoir.tools/nfts");
-        // setNFTs(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -85,7 +76,6 @@ export default function NFTCardFrame() {
     // console.log(res)
     return res.data.data.data
   }
-
 
   // 悬浮显示卡片内容
   const CardContent = ({ nft, index }) => {
