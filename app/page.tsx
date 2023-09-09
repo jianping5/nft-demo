@@ -100,7 +100,7 @@ export default function NFTCardFrame() {
   
       fetchMetadata();
     }, [nft.token.tokenId]);
-    imageSmall
+
     return (
       <Card>
         <Row gutter={16}>
