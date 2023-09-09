@@ -84,7 +84,7 @@ export default function NFTCardFrame() {
   }
 
   // 悬浮显示卡片内容
-  const CardContent = ({nft}) => {
+  const CardContent: React.FC<{ nft: {token: {tokenId: string, imageSmall: string}} }> = ({ nft }) => {
 
     const [metadata, setMetadata] = useState<null | { attributes: { trait_type: string; value: string; }[] }>(null);
 
@@ -100,7 +100,7 @@ export default function NFTCardFrame() {
   
       fetchMetadata();
     }, [nft.token.tokenId]);
-
+    imageSmall
     return (
       <Card>
         <Row gutter={16}>
