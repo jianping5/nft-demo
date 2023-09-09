@@ -91,7 +91,9 @@ export default function NFTCardFrame() {
     useEffect(() => {
       // 异步加载 metadata
       const fetchMetadata = async () => {
-        const response = await getMetaData(nft.token.tokenId);
+        const response = await getMetaData(nft.token.tokenId) as { attributes: [{
+          trait_type: string, value: string,
+        }] };
         console.log(response)
         setMetadata(response); // 使用 setMetadata 更新 metadata 的值
       };
