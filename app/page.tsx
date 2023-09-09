@@ -78,7 +78,7 @@ export default function NFTCardFrame() {
 
   // 获取 metadata
   const getMetaData = async (tokenId:any) => {
-    const res = await axios.post('http://localhost:3000/api/metadata?collection=0x5Af0D9827E0c53E4799BB226655A1de152A425a5&tokenId=' + tokenId)
+    const res = await axios.post('https://nft-demo-eight.vercel.app/api/metadata?collection=0x5Af0D9827E0c53E4799BB226655A1de152A425a5&tokenId=' + tokenId)
     // console.log(res)
     return res.data.data.data
   }
