@@ -1,113 +1,169 @@
-import Image from 'next/image'
+"use client";
+import React, { useState, useEffect } from "react";
+import { Card, Row, Col, Input, Popover } from "antd";
+import Web3 from "web3";
+import axios from 'axios'
+import contractABI from '../utils/contractABI.json';
 
-export default function Home() {
+export default function NFTCardFrame() {
+  const { Meta } = Card;
+  const {Search} = Input;
+  const reservoirApiKey = 'f61ab833-9b87-5fb9-96fa-e6f3323bb0e4';
+  const [nfts, setNFTs] = useState([]);
+  const [accounts, setAccounts] = useState([]);
+  const [web3, setWeb3] = useState(null);
+  const [searchTokenId, setSearchTokenId] = useState(''); // 搜索框的值
+
+  useEffect(() => {
+    // 检查是否存在以太坊钱包提供程序
+    if (window.ethereum) {
+      const web3Instance = new Web3(window.ethereum);
+
+      // const getNFT = async () => {
+      //   const contract = new web3Instance.eth.Contract(contractABI, '0x5Af0D9827E0c53E4799BB226655A1de152A425a5');
+      //   const uri = await contract.methods.tokenURI(6503).call();
+      //   console.log(uri)
+      // }
+
+      // 请求用户授权连接钱包
+      window.ethereum.request({ method: 'eth_requestAccounts' })
+        .then((accounts) => {
+          // 用户已授权连接钱包
+          // 可以在这里进行后续操作
+          console.log(accounts)
+          console.log("已连接钱包");
+          setWeb3(web3Instance)
+          // setWeb3(web3Instance)
+          // demo:
+          // getMetaData(6503)
+
+        })
+        .catch((error) => {
+          // 处理错误
+          console.error(error);
+        });
+    } else {
+      // 如果没有以太坊钱包提供程序，则显示错误或提示用户下载钱包应用程序
+      console.error("未找到以太坊钱包提供程序");
+    }
+
+    // Fetch NFT data from Reservoir API
+    const fetchNFTs = async () => {
+      try {
+        const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': reservoirApiKey}};
+
+        fetch('https://api.reservoir.tools/tokens/v6?collection=0x5Af0D9827E0c53E4799BB226655A1de152A425a5', options)
+          .then(response => response.json())
+          .then(response => {
+            console.log(response.tokens)
+            setNFTs(response.tokens);
+          })
+          .catch(err => console.error(err));
+        // const response = await axios.get("https://api.reservoir.tools/nfts");
+        // setNFTs(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchNFTs();
+  }, []);
+
+  // 根据 tokenId 进行过滤，如果搜索框为空则不进行过滤
+  const filteredNFTs = searchTokenId
+    ? nfts.filter((nft) => nft.token.tokenId.toString() === searchTokenId)
+    : nfts;
+
+  // 搜索处理函数
+  const handleSearch = (value) => {
+    setSearchTokenId(value);
+  };
+
+  // 获取 metadata
+  const getMetaData = async (tokenId) => {
+    const res = await axios.post('http://localhost:3000/api/metadata?collection=0x5Af0D9827E0c53E4799BB226655A1de152A425a5&tokenId=' + tokenId)
+    // console.log(res)
+    return res.data.data.data
+  }
+
+
+  // 悬浮显示卡片内容
+  const CardContent = ({ nft, index }) => {
+
+    const [metadata, setMetadata] = useState(null);
+
+    useEffect(() => {
+      // 异步加载 metadata
+      const fetchMetadata = async () => {
+        const response = await getMetaData(nft.token.tokenId);
+        console.log(response)
+        setMetadata(response); // 使用 setMetadata 更新 metadata 的值
+      };
+  
+      fetchMetadata();
+    }, [nft.token.tokenId]);
+
+    return (
+      <Card>
+        <Row gutter={16}>
+          {/* 左边的列 */}
+          <Col span={8}>
+            <img src={nft.token.imageSmall} alt="图片" style={{ width: '100%', height: 'auto' }} />
+          </Col>
+
+          {/* 右边的列 */}
+          <Col span={16}>
+            <div>
+              <p>Current Price: 0.2699 ETH</p>
+              {metadata && (
+                <>
+                <div>
+                  {/* 使用 Grid 组件创建多行小卡片 */}
+                  <Row gutter={16}>
+                    {metadata.attributes.map((attribute, index) => (
+                      // 循环遍历属性数组，并生成对应的小卡片
+                      <Col span={6} key={index}>
+                        <Card >
+                          <p>{attribute.trait_type}</p>
+                          <p>{attribute.value}</p>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+                </div>
+              </>
+            )}
+            </div>
+          </Col>
+        </Row>
+      </Card>
+    );
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    <div>
+      <Search placeholder="请输入 tokenId" onSearch={handleSearch} style={{ marginBottom: 16 }} />
+      <Row gutter={[24, 24]}>
+        {filteredNFTs.map((nft, index) => (
+          <Col key={index} span={24/6}>
+            <Popover 
+            // 组件式引入，便于传递参数
+            content={<CardContent nft={nft} index={index} />}
+            overlayStyle={{ position: 'absolute', zIndex: 1000 }}
+            >
+              <Card
+                hoverable
+                cover={<img alt={nft.name} src={nft.token.imageSmall} />}
+              >
+                <Meta title={nft.token.tokenId} />
+              </Card>
+            </Popover>
+          </Col>
+        ))}
+      </Row>
+    </div>
+);
 }
+
+
+
