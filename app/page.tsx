@@ -17,21 +17,21 @@ export default function NFTCardFrame() {
   useEffect(() => {
     console.log(reservoirApiKey)
     // 检查是否存在以太坊钱包提供程序
-    if (window.ethereum) {
-      const web3Instance = new Web3(window.ethereum);
+    if ((window as any).ethereum) {
+      const web3Instance = new Web3((window as any).ethereum);
 
 
       // 请求用户授权连接钱包
-      window.ethereum.request({ method: 'eth_requestAccounts' })
-        .then((accounts) => {
+      (window as any).ethereum.request({ method: 'eth_requestAccounts' })
+        .then((accounts:any) => {
           // 用户已授权连接钱包
           // 可以在这里进行后续操作
           console.log(accounts)
           console.log("已连接钱包");
-          setWeb3(web3Instance)
-          setAccounts(accounts)
+          // setWeb3(web3Instance)
+          // setAccounts(accounts)
         })
-        .catch((error) => {
+        .catch((error:any) => {
           // 处理错误
           console.error(error);
         });
@@ -66,19 +66,19 @@ export default function NFTCardFrame() {
     : nfts;
 
   // 搜索处理函数
-  const handleSearch = (value) => {
+  const handleSearch = (value:any) => {
     setSearchTokenId(value);
   };
 
   // 获取 metadata
-  const getMetaData = async (tokenId) => {
+  const getMetaData = async (tokenId:any) => {
     const res = await axios.post('http://localhost:3000/api/metadata?collection=0x5Af0D9827E0c53E4799BB226655A1de152A425a5&tokenId=' + tokenId)
     // console.log(res)
     return res.data.data.data
   }
 
   // 悬浮显示卡片内容
-  const CardContent = ({ nft, index }) => {
+  const CardContent = ({nft}) => {
 
     const [metadata, setMetadata] = useState(null);
 
@@ -110,7 +110,7 @@ export default function NFTCardFrame() {
                 <div>
                   {/* 使用 Grid 组件创建多行小卡片 */}
                   <Row gutter={16}>
-                    {metadata.attributes.map((attribute, index) => (
+                    {metadata?.attributes.map((attribute, index) => (
                       // 循环遍历属性数组，并生成对应的小卡片
                       <Col span={6} key={index}>
                         <Card >
@@ -134,11 +134,11 @@ export default function NFTCardFrame() {
     <div>
       <Search placeholder="请输入 tokenId" onSearch={handleSearch} style={{ marginBottom: 16 }} />
       <Row gutter={[24, 24]}>
-        {filteredNFTs.map((nft, index) => (
+        {filteredNFTs.map((nft:any, index:any) => (
           <Col key={index} span={24/6}>
             <Popover 
             // 组件式引入，便于传递参数
-            content={<CardContent nft={nft} index={index} />}
+            content={<CardContent nft={nft} />}
             overlayStyle={{ position: 'absolute', zIndex: 1000 }}
             >
               <Card
