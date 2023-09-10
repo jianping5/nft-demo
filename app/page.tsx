@@ -54,16 +54,16 @@ export default function NFTCardFrame() {
         .then((accounts:any) => {
           // 用户已授权连接钱包
           // 可以在这里进行后续操作
-          // console.log(accounts[0])
+          console.log(accounts[0])
           const nftContract = new web3Instance.eth.Contract(contractABI, '0x5Af0D9827E0c53E4799BB226655A1de152A425a5');
           // todo： 这里暂时用别人的钱包地址（方便前端显示）
           const accountAddress = '0x9eAeC4D4296D3cd7C59847cDbf5c28C2C0ad0BC3'
-          nftContract.methods.balanceOf(accountAddress).call()
+          nftContract.methods.balanceOf().call()
           .then((balance:string) => {
             const numNFTs = parseInt(balance, 10);
             // console.log('NFT 数量:', numNFTs);
             for (let i = 0; i < numNFTs; i++) {
-              nftContract.methods.tokenOfOwnerByIndex(accountAddress, i).call()
+              nftContract.methods.tokenOfOwnerByIndex().call()
                 .then((tokenId: string) => {
                   console.log('NFT ID:', tokenId);
                   tokenIds.push(tokenId);
@@ -113,8 +113,6 @@ export default function NFTCardFrame() {
           // todo: ... 会出现预料之外的结果
           // tmpNfts.push(...response.tokens);
           tmpNfts.push(response.tokens[0]);
-          console.log("tmpNfs", tmpNfts)
-          // console.log(tokenId, ...response.tokens); 
         })
         .catch(err => console.error(err));
   
@@ -129,7 +127,6 @@ export default function NFTCardFrame() {
         // const updatedFilteredNFTs = tmpNfts.filter((nft: { token: { tokenId: string, imageSmall: string }}) => {
         //   return tokenIds.includes(nft.token.tokenId);
         // });
-        // console.log("12356789", updatedFilteredNFTs);
         setFilteredNFTs(tmpNfts);
       });
   };
